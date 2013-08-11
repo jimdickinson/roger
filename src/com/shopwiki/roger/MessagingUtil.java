@@ -115,7 +115,7 @@ public class MessagingUtil {
     }
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static final ObjectWriter prettyPrintWriter = objectMapper.defaultPrettyPrintingWriter();
+    private static final ObjectWriter prettyPrintWriter = objectMapper.writerWithDefaultPrettyPrinter();
 
     public static <T> T getDeliveryBody(byte[] body, TypeReference<?> typeRef) throws IOException {
         ByteArrayInputStream in = new ByteArrayInputStream(body);
