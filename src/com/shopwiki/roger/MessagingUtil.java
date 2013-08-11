@@ -16,15 +16,23 @@
 
 package com.shopwiki.roger;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.Date;
 
-import org.codehaus.jackson.map.*;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.ObjectWriter;
+import org.codehaus.jackson.type.JavaType;
 import org.codehaus.jackson.type.TypeReference;
 
 import com.rabbitmq.client.AMQP.BasicProperties;
-import com.rabbitmq.client.*;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Envelope;
+import com.shopwiki.roger.rpc.RequestHandler;
 
 /**
  * Static methods for sending JSON-formatted messages (using <A href="http://jackson.codehaus.org/">Jackson</A>) over RabbitMQ.
@@ -113,5 +121,27 @@ public class MessagingUtil {
         ByteArrayInputStream in = new ByteArrayInputStream(body);
         InputStreamReader reader = new InputStreamReader(in, UTF_8);
         return objectMapper.readValue(reader, typeRef);
+    }
+    
+    public static <T> T getDeliveryBody(byte[] body, JavaType javaType) throws IOException {
+        ByteArrayInputStream in = new ByteArrayInputStream(body);
+        InputStreamReader reader = new InputStreamReader(in, UTF_8);
+        return objectMapper.readValue(reader, javaType);
+    }
+    
+    public static JavaType getJavaForHandlerWithReflection(RequestHandler<?,?> handler) {
+        Type[] interfaces = handler.getClass().getGenericInterfaces();
+        for (Type type : interfaces) {
+            if (type instanceof ParameterizedType == false) {
+                continue;
+            }
+            ParameterizedType pt = (ParameterizedType) type;
+            if (pt.getRawType().toString().equals("interface " + RequestHandler.class.getCanonicalName())) {
+                Type[] types = pt.getActualTypeArguments();
+                return objectMapper.getTypeFactory().constructType(types[0]);
+            }
+        }
+
+        throw new RuntimeException("Could not find JavaType from the return type of " + handler.getClass().getCanonicalName());
     }
 }

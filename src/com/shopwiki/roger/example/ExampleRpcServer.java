@@ -19,11 +19,10 @@ package com.shopwiki.roger.example;
 import java.io.IOException;
 import java.util.Map;
 
-import org.codehaus.jackson.type.TypeReference;
-
 import com.rabbitmq.client.Address;
 import com.rabbitmq.client.Channel;
-import com.shopwiki.roger.*;
+import com.shopwiki.roger.QueueUtil;
+import com.shopwiki.roger.RabbitConnector;
 import com.shopwiki.roger.RabbitReconnector.ReconnectLogger;
 import com.shopwiki.roger.rpc.BasicWorkerFactory;
 import com.shopwiki.roger.rpc.PostProcessors;
@@ -53,10 +52,6 @@ public class ExampleRpcServer {
     public static void main(String[] args) throws Exception {
 
         RequestHandler<Request, Response> handler = new RequestHandler<Request, Response>() {
-            @Override
-            public TypeReference<Request> getRequestType() {
-                return new TypeReference<Request>() {};
-            }
 
             @Override
             public Response handleRequest(Request request) throws Exception {

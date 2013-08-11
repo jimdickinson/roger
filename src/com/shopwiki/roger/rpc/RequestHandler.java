@@ -16,7 +16,6 @@
 
 package com.shopwiki.roger.rpc;
 
-import org.codehaus.jackson.type.TypeReference;
 
 /**
  * This interface is left for the user to implement.
@@ -29,14 +28,6 @@ import org.codehaus.jackson.type.TypeReference;
  * @author rstewart
  */
 public interface RequestHandler<I,O> {
-
-    // TODO: WHY doesn't this work ???
-    //private final TypeReference<T> typeRef = new TypeReference<T>() { };
-    // ...oh Well, make them implement one more method.
-    /**
-     * @return A TypeReference used by Jackson to know what class to instantiate when deserializing requests.
-     */
-    TypeReference<I> getRequestType();
 
     /**
      * @param request Deserialized from JSON.

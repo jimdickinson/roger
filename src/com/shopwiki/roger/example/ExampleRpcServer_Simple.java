@@ -44,11 +44,6 @@ public class ExampleRpcServer_Simple {
 
         RequestHandler<Request, Response> handler = new RequestHandler<Request, Response>() {
             @Override
-            public TypeReference<Request> getRequestType() {
-                return new TypeReference<Request>() {};
-            }
-
-            @Override
             public Response handleRequest(Request request) throws Exception {
                 return new Response("Hello " + request.name + "!");
             }
