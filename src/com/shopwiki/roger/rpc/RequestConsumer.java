@@ -18,12 +18,17 @@ package com.shopwiki.roger.rpc;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.codehaus.jackson.type.TypeReference;
+import org.codehaus.jackson.type.JavaType;
 
-import com.rabbitmq.client.*;
 import com.rabbitmq.client.AMQP.BasicProperties;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Consumer;
+import com.rabbitmq.client.DefaultConsumer;
+import com.rabbitmq.client.Envelope;
 import com.shopwiki.roger.MessagingUtil;
 
 /**
@@ -51,7 +56,7 @@ public class RequestConsumer<I> extends DefaultConsumer {
     }
 
     private final RequestHandler<I,?> handler;
-    private final TypeReference<I> requestType;
+    private final JavaType requestType;
     private final Channel channel;
     private final String queueName;
     private final PostProcessors pps;
@@ -66,7 +71,7 @@ public class RequestConsumer<I> extends DefaultConsumer {
     private RequestConsumer(RequestHandler<I,?> handler, Channel channel, String queueName, PostProcessors pps) {
         super(channel);
         this.handler = handler;
-        this.requestType = handler.getRequestType();
+        this.requestType = MessagingUtil.getJavaForHandlerWithReflection(handler);
         this.channel = channel;
         this.queueName = queueName;
         this.pps = pps;
